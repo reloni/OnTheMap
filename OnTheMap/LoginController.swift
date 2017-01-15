@@ -23,8 +23,24 @@ class LoginController: UIViewController {
 	}
 
 	@IBAction func logInTap(_ sender: Any) {
-		let controller = self.storyboard!.instantiateViewController(withIdentifier: "RootNavigationController")
-		present(controller, animated: true, completion: nil)
+		guard let login = loginTextField.text, login.characters.count > 0 else { return }
+		guard let password = passwordTextField.text, password.characters.count > 0 else { return }
+		
+		networkService.login(userName: login, password: password) { result in
+			switch result {
+			case .error(let data, _, _):
+				guard let jsonResponse = data?.fromUdacityData().toJsonSafe() else { return }
+				print(jsonResponse)
+			case .success(let json):
+				print(json)
+			default: return
+			}
+			//print(result)
+			
+		}
+		
+		//let controller = self.storyboard!.instantiateViewController(withIdentifier: "RootNavigationController")
+		//present(controller, animated: true, completion: nil)
 	}
 }
 

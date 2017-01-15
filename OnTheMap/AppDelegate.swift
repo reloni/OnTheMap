@@ -8,7 +8,10 @@
 
 import UIKit
 
+let networkService = NetworkService()
+
 @UIApplicationMain
+
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
 	var window: UIWindow?
