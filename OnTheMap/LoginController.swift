@@ -9,6 +9,8 @@
 import UIKit
 
 class LoginController: UIViewController {
+	@IBOutlet weak var loginTextField: UITextField!
+	@IBOutlet weak var passwordTextField: UITextField!
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -20,6 +22,9 @@ class LoginController: UIViewController {
 		// Dispose of any resources that can be recreated.
 	}
 
-
+	@IBAction func logInTap(_ sender: Any) {
+		let controller = self.storyboard!.instantiateViewController(withIdentifier: "RootNavigationController")
+		present(controller, animated: true, completion: nil)
+	}
 }
 
