@@ -26,21 +26,12 @@ class LoginController: UIViewController {
 		guard let login = loginTextField.text, login.characters.count > 0 else { return }
 		guard let password = passwordTextField.text, password.characters.count > 0 else { return }
 		
-		networkService.login(userName: login, password: password) { result in
-			switch result {
-			case .error(let data, _, _):
-				guard let jsonResponse = data?.fromUdacityData().toJsonSafe() else { return }
-				print(jsonResponse)
-			case .success(let json):
-				print(json)
-			default: return
+		apiClient.login(userName: login, password: password) { result in
+			switch result{
+			case .logIn(let user): print(user)
+			case .error(let e): print(e)
 			}
-			//print(result)
-			
 		}
-		
-		//let controller = self.storyboard!.instantiateViewController(withIdentifier: "RootNavigationController")
-		//present(controller, animated: true, completion: nil)
 	}
 }
 

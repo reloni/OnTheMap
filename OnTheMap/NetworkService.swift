@@ -8,17 +8,43 @@
 
 import Foundation
 
-typealias JSON = Dictionary<String, Any>
 typealias UrlRequestResult = (Data?, URLResponse?, Error?) -> ()
 
-enum NetworkRequestResult {
-	case success(JSON)
-	case error(Data?, Error?, HTTPURLResponse)
+enum ApplicationErrors : Error {
+	case incorrectUserData
 	case unknown
 	case jsonParseError(Error)
+	case serverSideError([String: Any])
 }
 
-final class NetworkService {
+struct LoggedUser {
+	let registered: Bool
+	let key: String
+	let sessionId: String
+	
+	init?(json: [String: Any]) {
+		guard let reg: Bool = json[jsonKey: "account"]?["registered"] as? Bool else { return nil }
+		guard let key: String = json[jsonKey: "account"]?["key"] as? String else { return nil }
+		guard let id: String = json[jsonKey: "session"]?["id"] as? String else { return nil }
+		
+		self.registered = reg
+		self.key = key
+		self.sessionId = id
+	}
+}
+
+enum NetworkRequestResult {
+	case success([String: Any])
+	case error(Data?, Error, HTTPURLResponse)
+	case unknown
+}
+
+enum ApiRequestResult {
+	case error(Error)
+	case logIn(LoggedUser)
+}
+
+final class NetworkClient {
 	let session: URLSession
 	
 	init(session: URLSession = URLSession(configuration: .default)) {
@@ -29,13 +55,24 @@ final class NetworkService {
 		print("Execute url: \(request.url?.absoluteString ?? "")")
 		session.dataTask(with: request, completionHandler: completion).resume()
 	}
+}
+
+final class ApiClient {
+	let networkClient: NetworkClient
+	init(networkClient: NetworkClient = NetworkClient()) {
+		self.networkClient = networkClient
+	}
 	
-	func parseResponse(responseHandler: @escaping (NetworkRequestResult) -> ()) -> UrlRequestResult {
+	private func parseResponse(responseHandler: @escaping (NetworkRequestResult) -> ()) -> UrlRequestResult {
 		return { data, response, error in
 			let response = response as! HTTPURLResponse
 			
 			guard 200...299 ~= response.statusCode else {
-				responseHandler(.error(data, error, response))
+				if let serverResponse = data?.fromUdacityData().toJsonSafe() {
+					responseHandler(.error(data, ApplicationErrors.serverSideError(serverResponse), response))
+				} else {
+					responseHandler(.error(data, error ?? ApplicationErrors.unknown, response))
+				}
 				return
 			}
 			
@@ -46,17 +83,30 @@ final class NetworkService {
 			}
 			
 			do {
-				//print(NSString(data: unwrappedData.fromUdacityData(), encoding: String.Encoding.utf8.rawValue))
 				let json = try unwrappedData.fromUdacityData().toJson()
 				responseHandler(.success(json))
 			} catch let e {
-				responseHandler(.jsonParseError(e))
+				responseHandler(.error(data, ApplicationErrors.jsonParseError(e), response))
 			}
 		}
 	}
 	
-	func login(userName: String, password: String, completion: @escaping (NetworkRequestResult) -> ()) {
+	func login(userName: String, password: String, completion: @escaping (ApiRequestResult) -> ()) {
 		let request = URLRequest.udacityLogin(userName: userName, password: password)
-		execute(request, completion: parseResponse(responseHandler: completion))
+		
+		networkClient.execute(request, completion: parseResponse(responseHandler: { result in
+			switch result {
+			case .success(let json):
+				if let user = LoggedUser(json: json) {
+					completion(.logIn(user))
+				} else {
+					completion(.error(ApplicationErrors.incorrectUserData))
+				}
+			case .error(_, let error, _):
+				completion(.error(error))
+			case .unknown:
+				completion(.error(ApplicationErrors.unknown))
+			}
+		}))
 	}
 }

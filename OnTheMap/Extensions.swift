@@ -1,12 +1,18 @@
 //
-//  NetworkExtensions.swift
+//  Extensions.swift
 //  OnTheMap
 //
-//  Created by Anton Efimenko on 15.01.17.
+//  Created by Anton Efimenko on 17.01.17.
 //  Copyright © 2017 Anton Efimenko. All rights reserved.
 //
 
 import Foundation
+
+extension Dictionary {
+	subscript(jsonKey key: Key) -> [String:Any]? {
+		return self[key] as? [String:Any]
+	}
+}
 
 extension URLRequest {
 	static let udacityLoginUrl = URL(string: "https://www.udacity.com/api/session")!
@@ -26,11 +32,11 @@ extension Data {
 		return Data(dropFirst(5))
 	}
 	
-	func toJson() throws -> JSON {
-		return try JSONSerialization.jsonObject(with: self, options: []) as! JSON
+	func toJson() throws -> [String: Any] {
+		return try JSONSerialization.jsonObject(with: self, options: []) as! [String: Any]
 	}
 	
-	func toJsonSafe() -> JSON? {
+	func toJsonSafe() -> [String: Any]? {
 		return try? toJson()
 	}
 }

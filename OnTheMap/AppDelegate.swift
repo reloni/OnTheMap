@@ -8,7 +8,7 @@
 
 import UIKit
 
-let networkService = NetworkService()
+let apiClient = ApiClient()
 
 @UIApplicationMain
 
