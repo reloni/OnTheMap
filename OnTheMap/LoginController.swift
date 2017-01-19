@@ -26,10 +26,10 @@ class LoginController: UIViewController {
 		guard let login = loginTextField.text, login.characters.count > 0 else { return }
 		guard let password = passwordTextField.text, password.characters.count > 0 else { return }
 		
-		apiClient.login(userName: login, password: password) { result in
+		apiClient.login(userName: login, password: password) { [weak self] result in
 			switch result{
 			case .login(let user): print(user)
-			case .error(let e): print(e)
+			case .error(let e): DispatchQueue.main.async { self?.showErrorAlert(error: e) }
 			default: break
 			}
 		}

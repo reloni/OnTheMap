@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension Dictionary {
 	subscript(jsonKey key: Key) -> [String:Any]? {
@@ -43,5 +44,31 @@ extension Data {
 	
 	func toJsonSafe() -> [String: Any]? {
 		return try? toJson()
+	}
+}
+
+extension UIViewController {
+	var appDelegate: AppDelegate {
+		return UIApplication.shared.delegate as! AppDelegate
+	}
+	
+	func showErrorAlert(error: Error) {
+		let errorMessage: String = {
+			switch error {
+			case ApplicationErrors.incorrectServerResponse: return "Incorrect response from server"
+			case ApplicationErrors.jsonParseError(let e): return e.localizedDescription
+			case ApplicationErrors.serverSideError(let json): return (json["error"] as? String) ?? "Unknown error"
+			default: return error.localizedDescription
+			}
+		}()
+		
+		showErrorAlert(message: errorMessage)
+	}
+	
+	func showErrorAlert(message: String) {
+		let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+		let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
+		alert.addAction(ok)
+		present(alert, animated: true, completion: nil)
 	}
 }

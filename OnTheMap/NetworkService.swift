@@ -11,7 +11,7 @@ import Foundation
 typealias UrlRequestResult = (Data?, URLResponse?, Error?) -> ()
 
 enum ApplicationErrors : Error {
-	case incorrectUserData
+	case incorrectServerResponse
 	case unknown
 	case jsonParseError(Error)
 	case serverSideError([String: Any])
@@ -95,7 +95,7 @@ final class ApiClient {
 				if let info = AuthenticationInfo(json: json) {
 					completion(.authentication(info))
 				} else {
-					completion(.error(ApplicationErrors.incorrectUserData))
+					completion(.error(ApplicationErrors.incorrectServerResponse))
 				}
 			case .error(_, let error, _):
 				completion(.error(error))
@@ -114,7 +114,7 @@ final class ApiClient {
 				if let user = UdacityUser(authInfo: auth, json: json) {
 					completion(.login(user))
 				} else {
-					completion(.error(ApplicationErrors.incorrectUserData))
+					completion(.error(ApplicationErrors.incorrectServerResponse))
 				}
 			case .error(_, let error, _):
 				completion(.error(error))

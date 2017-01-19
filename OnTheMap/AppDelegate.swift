@@ -13,6 +13,7 @@ let apiClient = ApiClient()
 @UIApplicationMain
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
+	var udacityUser: UdacityUser?
 
 	var window: UIWindow?
 
