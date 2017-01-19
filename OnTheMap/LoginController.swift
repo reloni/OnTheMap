@@ -12,24 +12,19 @@ class LoginController: UIViewController {
 	@IBOutlet weak var loginTextField: UITextField!
 	@IBOutlet weak var passwordTextField: UITextField!
 
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		// Do any additional setup after loading the view, typically from a nib.
-	}
-
-	override func didReceiveMemoryWarning() {
-		super.didReceiveMemoryWarning()
-		// Dispose of any resources that can be recreated.
-	}
-
 	@IBAction func logInTap(_ sender: Any) {
+//		presentRootController()
+//		return
+		
 		guard let login = loginTextField.text, login.characters.count > 0 else { return }
 		guard let password = passwordTextField.text, password.characters.count > 0 else { return }
 		
 		apiClient.login(userName: login, password: password) { [weak self] result in
 			switch result{
-			case .login(let user): print(user)
-			case .error(let e): DispatchQueue.main.async { self?.showErrorAlert(error: e) }
+			case .login(let user):
+				self?.appDelegate.udacityUser = user
+				self?.presentRootController()
+			case .error(let e): self?.showErrorAlert(error: e)
 			default: break
 			}
 		}

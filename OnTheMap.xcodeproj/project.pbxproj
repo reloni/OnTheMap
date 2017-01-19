@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		6E200BD51E2E98DA0094A7DE /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E200BD41E2E98DA0094A7DE /* Extensions.swift */; };
 		6E3B261C1E313850003194FD /* Entities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3B261B1E313850003194FD /* Entities.swift */; };
+		6E3B261E1E3144D5003194FD /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3B261D1E3144D5003194FD /* TabBarController.swift */; };
 		6EDA098C1E2BB33300F2230E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDA098B1E2BB33300F2230E /* AppDelegate.swift */; };
 		6EDA098E1E2BB33300F2230E /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDA098D1E2BB33300F2230E /* LoginController.swift */; };
 		6EDA09911E2BB33300F2230E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6EDA098F1E2BB33300F2230E /* Main.storyboard */; };
@@ -22,6 +23,7 @@
 /* Begin PBXFileReference section */
 		6E200BD41E2E98DA0094A7DE /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Extensions.swift; path = ../Extensions.swift; sourceTree = "<group>"; };
 		6E3B261B1E313850003194FD /* Entities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Entities.swift; sourceTree = "<group>"; };
+		6E3B261D1E3144D5003194FD /* TabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		6EDA09881E2BB33300F2230E /* OnTheMap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OnTheMap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6EDA098B1E2BB33300F2230E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6EDA098D1E2BB33300F2230E /* LoginController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 				6EDA099F1E2BC2EC00F2230E /* TableController.swift */,
 				6EDA099D1E2BBE1300F2230E /* MapController.swift */,
 				6EDA098D1E2BB33300F2230E /* LoginController.swift */,
+				6E3B261D1E3144D5003194FD /* TabBarController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -177,6 +180,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6EDA09A41E2BC66700F2230E /* NetworkService.swift in Sources */,
+				6E3B261E1E3144D5003194FD /* TabBarController.swift in Sources */,
 				6EDA09A01E2BC2EC00F2230E /* TableController.swift in Sources */,
 				6EDA098E1E2BB33300F2230E /* LoginController.swift in Sources */,
 				6EDA099E1E2BBE1300F2230E /* MapController.swift in Sources */,

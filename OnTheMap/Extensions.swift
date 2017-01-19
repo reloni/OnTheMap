@@ -69,6 +69,16 @@ extension UIViewController {
 		let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
 		let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
 		alert.addAction(ok)
-		present(alert, animated: true, completion: nil)
+		
+		DispatchQueue.main.async {
+			self.present(alert, animated: true, completion: nil)
+		}
+	}
+	
+	func presentRootController() {
+		DispatchQueue.main.async {
+			let controller = self.storyboard!.instantiateViewController(withIdentifier: "RootNavigationController")
+			self.present(controller, animated: true, completion: nil)
+		}
 	}
 }

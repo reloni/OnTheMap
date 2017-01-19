@@ -164,12 +164,21 @@
         <!--Tab Bar Controller-->
         <scene sceneID="Lt2-dA-EDp">
             <objects>
-                <tabBarController storyboardIdentifier="RootTabController" id="CXp-e6-poR" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="RootTabController" id="CXp-e6-poR" customClass="TabBarController" customModule="OnTheMap" customModuleProvider="target" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" id="osx-xS-0Qe">
-                        <barButtonItem key="leftBarButtonItem" title="Log out" id="rPJ-jx-cHc"/>
+                        <barButtonItem key="leftBarButtonItem" title="LOGOUT" id="6B6-Ml-V8W">
+                            <color key="tintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="logOut:" destination="CXp-e6-poR" id="YL3-F1-3Ej"/>
+                            </connections>
+                        </barButtonItem>
                         <rightBarButtonItems>
                             <barButtonItem systemItem="add" id="5Cj-FK-pte"/>
-                            <barButtonItem systemItem="refresh" id="aWA-Qy-1AW"/>
+                            <barButtonItem systemItem="refresh" id="aWA-Qy-1AW">
+                                <connections>
+                                    <action selector="refresh:" destination="CXp-e6-poR" id="1ji-iC-ZIh"/>
+                                </connections>
+                            </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
                     <tabBar key="tabBar" contentMode="scaleToFill" id="Txw-zv-YvC">
