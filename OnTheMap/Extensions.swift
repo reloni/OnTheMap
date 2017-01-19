@@ -16,14 +16,19 @@ extension Dictionary {
 
 extension URLRequest {
 	static let udacityLoginUrl = URL(string: "https://www.udacity.com/api/session")!
+	static let udacityUserInfoUrl = URL(string: "https://www.udacity.com/api/users")!
+	
 	static func udacityLogin(userName: String, password: String) -> URLRequest {
 		var request = URLRequest(url: URLRequest.udacityLoginUrl)
 		request.httpMethod = "POST"
 		request.addValue("application/json", forHTTPHeaderField: "Accept")
 		request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 		request.httpBody = try? JSONSerialization.data(withJSONObject: ["udacity": ["username":userName, "password": password]], options: [])
-		//request.httpBody = "{\"udacity\": {\"username\": \"\(userName)\", \"password\": \"\(password)\"}}".data(using: String.Encoding.utf8)
 		return request
+	}
+	
+	static func udacityUserInfo(userId id: String) -> URLRequest {
+		return URLRequest(url: URLRequest.udacityUserInfoUrl.appendingPathComponent(id))
 	}
 }
 

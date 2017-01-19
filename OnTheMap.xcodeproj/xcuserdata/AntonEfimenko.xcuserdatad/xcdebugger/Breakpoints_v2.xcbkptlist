@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "OnTheMap/NetworkService.swift"
-            timestampString = "506372511.734211"
+            timestampString = "506543537.856174"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "68"
-            endingLineNumber = "68"
+            startingLineNumber = "55"
+            endingLineNumber = "55"
             landmarkName = "parseResponse(responseHandler:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "OnTheMap/NetworkService.swift"
-            timestampString = "506372511.734211"
+            timestampString = "506543537.856174"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "74"
-            endingLineNumber = "74"
+            startingLineNumber = "61"
+            endingLineNumber = "61"
             landmarkName = "parseResponse(responseHandler:)"
             landmarkType = "7">
          </BreakpointContent>

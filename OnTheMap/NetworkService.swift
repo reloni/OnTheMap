@@ -17,21 +17,7 @@ enum ApplicationErrors : Error {
 	case serverSideError([String: Any])
 }
 
-struct LoggedUser {
-	let registered: Bool
-	let key: String
-	let sessionId: String
-	
-	init?(json: [String: Any]) {
-		guard let reg: Bool = json[jsonKey: "account"]?["registered"] as? Bool else { return nil }
-		guard let key: String = json[jsonKey: "account"]?["key"] as? String else { return nil }
-		guard let id: String = json[jsonKey: "session"]?["id"] as? String else { return nil }
-		
-		self.registered = reg
-		self.key = key
-		self.sessionId = id
-	}
-}
+
 
 enum NetworkRequestResult {
 	case success([String: Any])
@@ -41,7 +27,8 @@ enum NetworkRequestResult {
 
 enum ApiRequestResult {
 	case error(Error)
-	case logIn(LoggedUser)
+	case authentication(AuthenticationInfo)
+	case login(UdacityUser)
 }
 
 final class NetworkClient {
@@ -92,13 +79,40 @@ final class ApiClient {
 	}
 	
 	func login(userName: String, password: String, completion: @escaping (ApiRequestResult) -> ()) {
+		authenticate(userName: userName, password: password) { [weak self] result in
+			guard case ApiRequestResult.authentication(let info) = result else { completion(result); return }
+			guard let this = self else { return }
+			this.loadUserInfo(auth: info, completion: completion)
+		}
+	}
+	
+	private func authenticate(userName: String, password: String, completion: @escaping (ApiRequestResult) -> ()) {
 		let request = URLRequest.udacityLogin(userName: userName, password: password)
 		
 		networkClient.execute(request, completion: parseResponse(responseHandler: { result in
 			switch result {
 			case .success(let json):
-				if let user = LoggedUser(json: json) {
-					completion(.logIn(user))
+				if let info = AuthenticationInfo(json: json) {
+					completion(.authentication(info))
+				} else {
+					completion(.error(ApplicationErrors.incorrectUserData))
+				}
+			case .error(_, let error, _):
+				completion(.error(error))
+			case .unknown:
+				completion(.error(ApplicationErrors.unknown))
+			}
+		}))
+	}
+	
+	private func loadUserInfo(auth: AuthenticationInfo, completion: @escaping (ApiRequestResult) -> ()) {
+		let request = URLRequest.udacityUserInfo(userId: auth.key)
+		
+		networkClient.execute(request, completion: parseResponse(responseHandler: { result in
+			switch result {
+			case .success(let json):
+				if let user = UdacityUser(authInfo: auth, json: json) {
+					completion(.login(user))
 				} else {
 					completion(.error(ApplicationErrors.incorrectUserData))
 				}

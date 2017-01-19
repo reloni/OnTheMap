@@ -28,8 +28,9 @@ class LoginController: UIViewController {
 		
 		apiClient.login(userName: login, password: password) { result in
 			switch result{
-			case .logIn(let user): print(user)
+			case .login(let user): print(user)
 			case .error(let e): print(e)
+			default: break
 			}
 		}
 	}
