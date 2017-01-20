@@ -17,19 +17,25 @@ enum ApplicationErrors : Error {
 	case serverSideError([String: Any])
 }
 
-
-
+/// Represents response from network
 enum NetworkRequestResult {
 	case success([String: Any])
 	case error(Data?, Error, HTTPURLResponse)
 	case unknown
 }
 
+/// Represents API call result
 enum ApiRequestResult {
+	/// Error occurred
 	case error(Error)
+	/// User successfully authenticated
 	case authentication(AuthenticationInfo)
+	/// User login completed
 	case login(UdacityUser)
+	/// Locations loaded
 	case studentLocations([StudentLocation])
+	/// User signed out
+	case logoff
 }
 
 final class NetworkClient {
@@ -39,6 +45,7 @@ final class NetworkClient {
 		self.session = session
 	}
 	
+	/// Executes URL request
 	func execute(_ request: URLRequest, completion: @escaping UrlRequestResult) {
 		print("Execute url: \(request.url?.absoluteString ?? "")")
 		session.dataTask(with: request, completionHandler: completion).resume()
@@ -53,7 +60,7 @@ final class ApiClient {
 	
 	private static func parseResponse(isUdacityResponse: Bool = true, responseHandler: @escaping (NetworkRequestResult) -> ()) -> UrlRequestResult {
 		return { data, response, error in
-			let response = response as! HTTPURLResponse
+			guard let response = response as? HTTPURLResponse else { responseHandler(.unknown); return }
 			
 			guard 200...299 ~= response.statusCode else {
 				if let serverResponse = data?.fromUdacityData().toJsonSafe() {
@@ -71,7 +78,6 @@ final class ApiClient {
 			}
 			
 			do {
-				//let json = try unwrappedData.fromUdacityData().toJson()
 				let json: [String: Any] = try {
 					if isUdacityResponse { return try unwrappedData.fromUdacityData().toJson() }
 					else { return try unwrappedData.toJson() }
@@ -84,7 +90,7 @@ final class ApiClient {
 	}
 	
 	private static func formatCompletionValue(for result: NetworkRequestResult,
-	                                          onSuccess: ([String:Any]?) -> ApiRequestResult,
+	                                          onSuccess: ([String:Any]) -> ApiRequestResult,
 	                                          onError: (Error) -> ApiRequestResult = { .error($0) },
 	                                          onUnknown: () -> ApiRequestResult = { .error(ApplicationErrors.unknown) }) -> ApiRequestResult {
 		switch result {
@@ -102,11 +108,17 @@ final class ApiClient {
 		}
 	}
 	
+	func logoff(completion: @escaping (ApiRequestResult) -> ()) {
+		let request = URLRequest.udacityLogoff()
+		networkClient.execute(request, completion: ApiClient.parseResponse(responseHandler: { result in
+			completion(ApiClient.formatCompletionValue(for: result, onSuccess: { _ in .logoff }))
+		}))
+	}
+	
 	func studentLocations(completion: @escaping (ApiRequestResult) -> ()) {
 		let request = URLRequest.studentLocations()
 		networkClient.execute(request, completion: ApiClient.parseResponse(isUdacityResponse: false, responseHandler: { result in
 			completion(ApiClient.formatCompletionValue(for: result, onSuccess: { json in
-				guard let json = json else { return .error(ApplicationErrors.incorrectServerResponse) }
 				guard let results: [Any] = json["results"] as? [Any] else { return .error(ApplicationErrors.incorrectServerResponse) }
 				
 				let locations = results.filter { $0 is [String: Any] }.map { StudentLocation(json: $0 as! [String:Any]) }.flatMap { $0 }
@@ -119,18 +131,13 @@ final class ApiClient {
 		let request = URLRequest.udacityLogin(userName: userName, password: password)
 		
 		networkClient.execute(request, completion: ApiClient.parseResponse(responseHandler: { result in
-			switch result {
-			case .success(let json):
+			completion(ApiClient.formatCompletionValue(for: result, onSuccess: { json in
 				if let info = AuthenticationInfo(json: json) {
-					completion(.authentication(info))
+					return .authentication(info)
 				} else {
-					completion(.error(ApplicationErrors.incorrectServerResponse))
+					return .error(ApplicationErrors.incorrectServerResponse)
 				}
-			case .error(_, let error, _):
-				completion(.error(error))
-			case .unknown:
-				completion(.error(ApplicationErrors.unknown))
-			}
+			}))
 		}))
 	}
 	
@@ -138,18 +145,13 @@ final class ApiClient {
 		let request = URLRequest.udacityUserInfo(userId: auth.key)
 		
 		networkClient.execute(request, completion: ApiClient.parseResponse(responseHandler: { result in
-			switch result {
-			case .success(let json):
+			completion(ApiClient.formatCompletionValue(for: result, onSuccess: { json in
 				if let user = UdacityUser(authInfo: auth, json: json) {
-					completion(.login(user))
+					return .login(user)
 				} else {
-					completion(.error(ApplicationErrors.incorrectServerResponse))
+					return .error(ApplicationErrors.incorrectServerResponse)
 				}
-			case .error(_, let error, _):
-				completion(.error(error))
-			case .unknown:
-				completion(.error(ApplicationErrors.unknown))
-			}
+			}))
 		}))
 	}
 }

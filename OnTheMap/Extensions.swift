@@ -16,15 +16,23 @@ extension Dictionary {
 }
 
 extension URLRequest {
-//	static let udacityLoginUrl = URL(string: "https://www.udacity.com/api/session")!
-//	static let udacityUserInfoUrl = URL(string: "https://www.udacity.com/api/users")!
-	
 	static func udacityLogin(userName: String, password: String) -> URLRequest {
 		var request = URLRequest(url: URL(string: "https://www.udacity.com/api/session")!)
 		request.httpMethod = "POST"
 		request.addValue("application/json", forHTTPHeaderField: "Accept")
 		request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 		request.httpBody = try? JSONSerialization.data(withJSONObject: ["udacity": ["username":userName, "password": password]], options: [])
+		return request
+	}
+	
+	static func udacityLogoff() -> URLRequest {
+		var request = URLRequest(url: URL(string: "https://www.udacity.com/api/session")!)
+		request.httpMethod = "DELETE"
+
+		if let xsrfCookie = { HTTPCookieStorage.shared.cookies?.filter { $0.name == "XSRF-TOKEN" }.first }() {
+			request.setValue(xsrfCookie.value, forHTTPHeaderField: "X-XSRF-TOKEN")
+		}
+
 		return request
 	}
 	

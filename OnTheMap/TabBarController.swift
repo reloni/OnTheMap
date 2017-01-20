@@ -12,13 +12,23 @@ final class TabBarController : UITabBarController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		//navigationItem.leftBarButtonItem?.title = "LOGOUT"
-		//UIBarButtonItem(title: "", style: ., target: <#T##Any?#>, action: <#T##Selector?#>)
 	}
 	
 	@IBAction func logOut(_ sender: Any) {
 		appDelegate.udacityUser = nil
-		dismiss(animated: true, completion: nil)
+		apiClient.logoff { [weak self] result in
+			if case ApiRequestResult.error = result {
+				self?.showErrorAlert(message: "Error while logging off")
+			}
+			
+			DispatchQueue.main.async {
+				// remove user password from keychain
+				let kc = Keychain()
+				kc.setString(string: nil, forAccount: "Password", synchronizable: true, background: false)
+				self?.dismiss(animated: true, completion: nil)
+			}
+		}
+		
 	}
 	
 	@IBAction func refresh(_ sender: Any) {
