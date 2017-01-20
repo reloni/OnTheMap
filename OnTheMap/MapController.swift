@@ -12,4 +12,11 @@ import UIKit
 final class MapController : UIViewController {
 	@IBOutlet weak var mapView: MKMapView!
 	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		
+		apiClient.studentLocations { result in
+				print(result)
+		}
+	}
 }

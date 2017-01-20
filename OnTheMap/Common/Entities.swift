@@ -38,3 +38,34 @@ struct UdacityUser {
 		lastName = ln
 	}
 }
+
+struct StudentLocation {
+	let firstName: String
+	let lastName: String
+	let latitude: Double
+	let longitude: Double
+	let mapString: String
+	let mediaURL: String
+	let objectId: String
+	let uniqueKey: String
+	
+	init?(json: [String:Any]) {
+		guard let fn: String = json["firstName"] as? String else { return nil }
+		guard let ln: String = json["lastName"] as? String else { return nil }
+		guard let ms: String = json["mapString"] as? String else { return nil }
+		guard let mu: String = json["mediaURL"] as? String else { return nil }
+		guard let oi: String = json["objectId"] as? String else { return nil }
+		guard let uk: String = json["uniqueKey"] as? String else { return nil }
+		guard let lo: Double = json["longitude"] as? Double else { return nil }
+		guard let la: Double = json["latitude"] as? Double else { return nil }
+		
+		firstName = fn
+		lastName = ln
+		latitude = la
+		longitude = lo
+		mapString = ms
+		mediaURL = mu
+		objectId = oi
+		uniqueKey = uk
+	}
+}

@@ -16,11 +16,11 @@ extension Dictionary {
 }
 
 extension URLRequest {
-	static let udacityLoginUrl = URL(string: "https://www.udacity.com/api/session")!
-	static let udacityUserInfoUrl = URL(string: "https://www.udacity.com/api/users")!
+//	static let udacityLoginUrl = URL(string: "https://www.udacity.com/api/session")!
+//	static let udacityUserInfoUrl = URL(string: "https://www.udacity.com/api/users")!
 	
 	static func udacityLogin(userName: String, password: String) -> URLRequest {
-		var request = URLRequest(url: URLRequest.udacityLoginUrl)
+		var request = URLRequest(url: URL(string: "https://www.udacity.com/api/session")!)
 		request.httpMethod = "POST"
 		request.addValue("application/json", forHTTPHeaderField: "Accept")
 		request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -29,7 +29,14 @@ extension URLRequest {
 	}
 	
 	static func udacityUserInfo(userId id: String) -> URLRequest {
-		return URLRequest(url: URLRequest.udacityUserInfoUrl.appendingPathComponent(id))
+		return URLRequest(url: URL(string: "https://www.udacity.com/api/users")!.appendingPathComponent(id))
+	}
+	
+	static func studentLocations() -> URLRequest {
+		var request = URLRequest(url: URL(string: "https://parse.udacity.com/parse/classes/StudentLocation?limit=100")!)
+		request.addValue("QrX47CA9cyuGewLdsL7o5Eb8iug6Em8ye0dnAbIr", forHTTPHeaderField: "X-Parse-Application-Id")
+		request.addValue("QuWThTdiRmTux3YaDseUSEpUKo7aBYM737yKd4gY", forHTTPHeaderField: "X-Parse-REST-API-Key")
+		return request
 	}
 }
 
