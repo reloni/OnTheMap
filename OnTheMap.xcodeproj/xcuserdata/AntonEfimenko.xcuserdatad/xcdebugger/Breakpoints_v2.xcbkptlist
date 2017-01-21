@@ -15,7 +15,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "57"
             endingLineNumber = "57"
-            landmarkName = "parseResponse(isUdacityResponse:responseHandler:)"
+            landmarkName = "init(networkClient:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -47,8 +47,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "117"
             endingLineNumber = "117"
-            landmarkName = "studentLocations(completion:)"
-            landmarkType = "7">
+            landmarkName = "ApiClient"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -63,7 +63,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "59"
             endingLineNumber = "59"
-            landmarkName = "parseResponse(isUdacityResponse:responseHandler:)"
+            landmarkName = "init(networkClient:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

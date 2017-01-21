@@ -15,8 +15,24 @@ final class MapController : UIViewController {
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
 		
-		apiClient.studentLocations { result in
-				print(result)
+		apiClient.studentLocations { [weak self] result in
+			switch result {
+			case ApiRequestResult.studentLocations(let locations): self?.addAnnototions(locations)
+			case .error(let e): self?.showErrorAlert(error: e)
+			default: break
+			}
+			
 		}
+	}
+	
+	func addAnnototions(_ locations: [StudentLocation]) {
+		let annotations = locations.map { loc -> MKPointAnnotation in
+			let annotation = MKPointAnnotation()
+			annotation.title = loc.mapString
+			annotation.coordinate = CLLocationCoordinate2D(latitude: loc.latitude, longitude: loc.longitude)
+			return annotation
+		}
+
+		mapView.addAnnotations(annotations)
 	}
 }

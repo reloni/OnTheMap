@@ -14,6 +14,7 @@ let apiClient = ApiClient()
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
 	var udacityUser: UdacityUser?
+	var locations = [StudentLocation]()
 
 	var window: UIWindow?
 
