@@ -12,3 +12,17 @@ final class TableController : UIViewController {
 	
 	@IBOutlet weak var tableView: UITableView!
 }
+
+extension TableController : UITableViewDataSource {
+	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+		return appDelegate.locations.count
+	}
+	
+	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		let cell = tableView.dequeueReusableCell(withIdentifier: "LocationCell", for: indexPath)
+		let location = appDelegate.locations[indexPath.row]
+		cell.textLabel?.text = "\(location.firstName) \(location.lastName)"
+		cell.imageView?.image = UIImage(named: "pin")!
+		return cell
+	}
+}

@@ -17,7 +17,9 @@ final class MapController : UIViewController {
 		
 		apiClient.studentLocations { [weak self] result in
 			switch result {
-			case ApiRequestResult.studentLocations(let locations): self?.addAnnototions(locations)
+			case ApiRequestResult.studentLocations(let locations):
+				self?.appDelegate.locations = locations
+				self?.addAnnototions(locations)
 			case .error(let e): self?.showErrorAlert(error: e)
 			default: break
 			}
@@ -28,8 +30,8 @@ final class MapController : UIViewController {
 	func addAnnototions(_ locations: [StudentLocation]) {
 		let annotations = locations.map { loc -> MKPointAnnotation in
 			let annotation = MKPointAnnotation()
+			annotation.title = "\(loc.firstName) \(loc.lastName)"
 			annotation.subtitle = loc.mediaURL
-			annotation.title = loc.mapString
 			annotation.coordinate = CLLocationCoordinate2D(latitude: loc.latitude, longitude: loc.longitude)
 			return annotation
 		}
@@ -42,7 +44,7 @@ final class MapController : UIViewController {
 
 extension MapController : MKMapViewDelegate {
 	func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-		print("viewForannotation")
+		//print("viewForannotation")
 		if annotation is MKUserLocation {
 			return nil
 		}
