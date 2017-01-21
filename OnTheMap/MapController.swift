@@ -28,11 +28,39 @@ final class MapController : UIViewController {
 	func addAnnototions(_ locations: [StudentLocation]) {
 		let annotations = locations.map { loc -> MKPointAnnotation in
 			let annotation = MKPointAnnotation()
+			annotation.subtitle = loc.mediaURL
 			annotation.title = loc.mapString
 			annotation.coordinate = CLLocationCoordinate2D(latitude: loc.latitude, longitude: loc.longitude)
 			return annotation
 		}
 
-		mapView.addAnnotations(annotations)
+		DispatchQueue.main.async {
+			self.mapView.addAnnotations(annotations)
+		}
+	}
+}
+
+extension MapController : MKMapViewDelegate {
+	func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+		print("viewForannotation")
+		if annotation is MKUserLocation {
+			return nil
+		}
+		
+		var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: "pin") as? MKPinAnnotationView
+		
+		if pinView == nil {
+			print("pin nil")
+			
+			pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "pin")
+			pinView!.canShowCallout = true
+			pinView!.animatesDrop = true
+			
+		}
+		
+		pinView?.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+		
+		
+		return pinView
 	}
 }
