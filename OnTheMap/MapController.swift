@@ -47,20 +47,24 @@ extension MapController : MKMapViewDelegate {
 			return nil
 		}
 		
-		var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: "pin") as? MKPinAnnotationView
-		
-		if pinView == nil {
-			print("pin nil")
-			
-			pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "pin")
-			pinView!.canShowCallout = true
-			pinView!.animatesDrop = true
-			
-		}
-		
-		pinView?.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
-		
+		let pinView: MKPinAnnotationView = {
+			guard let view = mapView.dequeueReusableAnnotationView(withIdentifier: "pin") as? MKPinAnnotationView else {
+				let pin = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "pin")
+				pin.canShowCallout = true
+				pin.animatesDrop = true
+				pin.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+				return pin
+			}
+			return view
+		}()
 		
 		return pinView
+	}
+	
+	func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+		guard let subtitle = view.annotation?.subtitle ?? nil else { return }
+		guard let url = URL(string: subtitle) else { return }
+		
+		UIApplication.shared.open(url, options: [:], completionHandler: nil)
 	}
 }
