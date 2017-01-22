@@ -32,7 +32,14 @@ final class TabBarController : UITabBarController {
 	}
 	
 	@IBAction func refresh(_ sender: Any) {
-		print("refresh")
+		print("refresh. Cur index: \(selectedIndex)")
+		
 	}
 	
+	@IBAction func addUserLocation(_ sender: Any) {
+		presentFindLocatonController { result in
+			print("New location: \(result.0)")
+			print("New url: \(result.1)")
+		}
+	}
 }

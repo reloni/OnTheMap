@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import MapKit
 
 extension Dictionary {
 	subscript(jsonKey key: Key) -> [String:Any]? {
@@ -63,6 +64,13 @@ extension Data {
 }
 
 extension UIViewController {
+	func loadGeoCoordinates(for geoString : String, completion: @escaping (CLLocationCoordinate2D?) -> Void) {
+		CLGeocoder().geocodeAddressString(geoString) { (marks, error) in
+			guard error == nil else { completion(nil); return }
+			completion(marks?.last?.location?.coordinate)
+		}
+	}
+	
 	var appDelegate: AppDelegate {
 		return UIApplication.shared.delegate as! AppDelegate
 	}
@@ -93,6 +101,15 @@ extension UIViewController {
 	func presentRootController() {
 		DispatchQueue.main.async {
 			let controller = self.storyboard!.instantiateViewController(withIdentifier: "RootNavigationController")
+			self.present(controller, animated: true, completion: nil)
+		}
+	}
+	
+	func presentFindLocatonController(completion: @escaping (CLLocationCoordinate2D, URL) -> ()) {
+		DispatchQueue.main.async {
+			let controller = self.storyboard!.instantiateViewController(withIdentifier: "FindLocationNavigationController") as! UINavigationController
+			(controller.topViewController as! FindLocationController).completion = completion
+			//controller.completion = completion
 			self.present(controller, animated: true, completion: nil)
 		}
 	}

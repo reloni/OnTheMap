@@ -12,8 +12,8 @@ import UIKit
 final class MapController : UIViewController {
 	@IBOutlet weak var mapView: MKMapView!
 	
-	override func viewDidAppear(_ animated: Bool) {
-		super.viewDidAppear(animated)
+	override func viewDidLoad() {
+		super.viewDidLoad()
 		
 		apiClient.studentLocations { [weak self] result in
 			switch result {
