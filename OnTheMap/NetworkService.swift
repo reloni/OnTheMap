@@ -36,6 +36,7 @@ enum ApiRequestResult {
 	case studentLocations([StudentLocation])
 	/// User signed out
 	case logoff
+	case currentUserLocation(StudentLocation?)
 }
 
 final class NetworkClient {
@@ -112,6 +113,16 @@ final class ApiClient {
 		let request = URLRequest.udacityLogoff()
 		networkClient.execute(request, completion: ApiClient.parseResponse(responseHandler: { result in
 			completion(ApiClient.formatCompletionValue(for: result, onSuccess: { _ in .logoff }))
+		}))
+	}
+	
+	func currentUserLocation(userUniqueKey: String, completion: @escaping (ApiRequestResult) -> ()) {
+		let request = URLRequest.userLocation(uniqueKey: userUniqueKey)
+		networkClient.execute(request, completion: ApiClient.parseResponse(isUdacityResponse: false, responseHandler: { result in
+			completion(ApiClient.formatCompletionValue(for: result, onSuccess: { json in
+				guard let locationJson = (json["results"] as? [Any])?.first as? [String:Any] else { return .currentUserLocation(nil) }
+				return .currentUserLocation(StudentLocation(json: locationJson))
+			}))
 		}))
 	}
 	

@@ -26,3 +26,12 @@ extension TableController : UITableViewDataSource {
 		return cell
 	}
 }
+
+extension TableController : UITableViewDelegate {
+	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		let location = appDelegate.locations[indexPath.row]
+		guard let url = URL(string: location.mediaURL) else { return }
+		
+		UIApplication.shared.open(url, options: [:], completionHandler: nil)
+	}
+}

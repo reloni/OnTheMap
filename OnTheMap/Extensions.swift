@@ -16,6 +16,19 @@ extension Dictionary {
 	}
 }
 
+extension URL {
+	init?(baseUrl: String, parameters: [String: String]? = nil) {
+		var components = URLComponents(string: baseUrl)
+		components?.queryItems = parameters?.map { key, value in
+			URLQueryItem(name: key, value: value)
+		}
+		
+		guard let absoluteString = components?.url?.absoluteString else { return nil }
+		
+		self.init(string: absoluteString)
+	}
+}
+
 extension URLRequest {
 	static func udacityLogin(userName: String, password: String) -> URLRequest {
 		var request = URLRequest(url: URL(string: "https://www.udacity.com/api/session")!)
@@ -42,7 +55,16 @@ extension URLRequest {
 	}
 	
 	static func studentLocations() -> URLRequest {
-		var request = URLRequest(url: URL(string: "https://parse.udacity.com/parse/classes/StudentLocation?limit=100")!)
+		var request = URLRequest(url: URL(string: "https://parse.udacity.com/parse/classes/StudentLocation?limit=100&order=-updatedAt")!)
+		request.addValue("QrX47CA9cyuGewLdsL7o5Eb8iug6Em8ye0dnAbIr", forHTTPHeaderField: "X-Parse-Application-Id")
+		request.addValue("QuWThTdiRmTux3YaDseUSEpUKo7aBYM737yKd4gY", forHTTPHeaderField: "X-Parse-REST-API-Key")
+		return request
+	}
+	
+	static func userLocation(uniqueKey: String) -> URLRequest {
+		var request = URLRequest(url: URL(baseUrl: "https://parse.udacity.com/parse/classes/StudentLocation",
+		                                  parameters: ["where": "{\"uniqueKey\":\"\(uniqueKey)\"}"])!)
+		
 		request.addValue("QrX47CA9cyuGewLdsL7o5Eb8iug6Em8ye0dnAbIr", forHTTPHeaderField: "X-Parse-Application-Id")
 		request.addValue("QuWThTdiRmTux3YaDseUSEpUKo7aBYM737yKd4gY", forHTTPHeaderField: "X-Parse-REST-API-Key")
 		return request

@@ -105,6 +105,7 @@
                                 </prototypes>
                                 <connections>
                                     <outlet property="dataSource" destination="yoa-4B-Xfv" id="UX2-MV-DCL"/>
+                                    <outlet property="delegate" destination="yoa-4B-Xfv" id="gxK-R9-aQn"/>
                                 </connections>
                             </tableView>
                         </subviews>
