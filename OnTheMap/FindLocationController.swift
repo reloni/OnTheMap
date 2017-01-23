@@ -11,7 +11,7 @@ import UIKit
 import MapKit
 
 final class FindLocationController : UIViewController {
-	var completion: ((CLLocationCoordinate2D, URL) -> ())?
+	var completion: ((CLLocationCoordinate2D, URL) -> ())!
 	
 	@IBOutlet weak var locationTextField: UITextField!
 	@IBOutlet weak var webSiteTextField: UITextField!
