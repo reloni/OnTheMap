@@ -23,7 +23,6 @@ final class MapController : UIViewController {
 			case .error(let e): self?.showErrorAlert(error: e)
 			default: break
 			}
-			
 		}
 	}
 	

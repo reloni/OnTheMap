@@ -69,6 +69,38 @@ extension URLRequest {
 		request.addValue("QuWThTdiRmTux3YaDseUSEpUKo7aBYM737yKd4gY", forHTTPHeaderField: "X-Parse-REST-API-Key")
 		return request
 	}
+	
+	static func createLocation(with locationJson: [String:Any]) -> URLRequest {
+		var request = URLRequest(url: URL(baseUrl: "https://parse.udacity.com/parse/classes/StudentLocation")!)
+		
+		request.httpMethod = "POST"
+		
+		request.addValue("application/json", forHTTPHeaderField: "Accept")
+		request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+		
+		request.addValue("QrX47CA9cyuGewLdsL7o5Eb8iug6Em8ye0dnAbIr", forHTTPHeaderField: "X-Parse-Application-Id")
+		request.addValue("QuWThTdiRmTux3YaDseUSEpUKo7aBYM737yKd4gY", forHTTPHeaderField: "X-Parse-REST-API-Key")
+		
+		request.httpBody = try? JSONSerialization.data(withJSONObject: locationJson, options: [])
+		
+		return request
+	}
+	
+	static func updateLocation(forLocationId: String, with locationJson: [String:Any]) -> URLRequest {
+		var request = URLRequest(url: URL(baseUrl: "https://parse.udacity.com/parse/classes/StudentLocation/\(forLocationId)")!)
+		
+		request.httpMethod = "PUT"
+		
+		request.addValue("application/json", forHTTPHeaderField: "Accept")
+		request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+		
+		request.addValue("QrX47CA9cyuGewLdsL7o5Eb8iug6Em8ye0dnAbIr", forHTTPHeaderField: "X-Parse-Application-Id")
+		request.addValue("QuWThTdiRmTux3YaDseUSEpUKo7aBYM737yKd4gY", forHTTPHeaderField: "X-Parse-REST-API-Key")
+		
+		request.httpBody = try? JSONSerialization.data(withJSONObject: locationJson, options: [])
+		
+		return request
+	}
 }
 
 extension Data {
@@ -127,11 +159,15 @@ extension UIViewController {
 		}
 	}
 	
-	func presentFindLocatonController(completion: @escaping (CLLocationCoordinate2D, URL) -> ()) {
+	func presentFindLocatonController(currentLocation: StudentLocation?, completion: @escaping (StudentLocation) -> ()) {
+		if currentLocation != nil {
+			// show alert
+			print("Current location exists: \(currentLocation != nil)")
+		}
+		
 		DispatchQueue.main.async {
 			let controller = self.storyboard!.instantiateViewController(withIdentifier: "FindLocationNavigationController") as! UINavigationController
 			(controller.topViewController as! FindLocationController).completion = completion
-			//controller.completion = completion
 			self.present(controller, animated: true, completion: nil)
 		}
 	}

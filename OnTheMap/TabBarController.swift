@@ -37,9 +37,33 @@ final class TabBarController : UITabBarController {
 	}
 	
 	@IBAction func addUserLocation(_ sender: Any) {
-		presentFindLocatonController { result in
-			print("New location: \(result.0)")
-			print("New url: \(result.1)")
+		apiClient.currentUserLocation(userUniqueKey: appDelegate.udacityUser!.authenticationInfo.key) { [weak self] result in
+				switch result {
+				case ApiRequestResult.currentUserLocation(let currentLocation):
+					self?.presentFindLocatonController(currentLocation: currentLocation) { result in
+						print("New location: \(result)")
+						if currentLocation == nil {
+							print("create new location")
+						} else {
+							print("update current location")
+							self?.updateUserLocation(currentLocationId: currentLocation!.objectId, template: result) { error in
+									print("update error: \(error)")
+							}
+						}
+					}
+				case .error(let e): self?.showErrorAlert(error: e)
+				default: break
+			}
+		}
+	}
+	
+	func updateUserLocation(currentLocationId: String, template: StudentLocation, completion: @escaping (Error?) -> ()) {
+		apiClient.updateLocation(locationId: currentLocationId, newLocation: template) { result in
+			switch result {
+			case .locationUpdated: completion(nil)
+			case .error(let e): completion(e)
+			default: break
+			}
 		}
 	}
 }

@@ -37,6 +37,8 @@ enum ApiRequestResult {
 	/// User signed out
 	case logoff
 	case currentUserLocation(StudentLocation?)
+	case locationCreated
+	case locationUpdated
 }
 
 final class NetworkClient {
@@ -64,7 +66,7 @@ final class ApiClient {
 			guard let response = response as? HTTPURLResponse else { responseHandler(.unknown); return }
 			
 			guard 200...299 ~= response.statusCode else {
-				if let serverResponse = data?.fromUdacityData().toJsonSafe() {
+				if let serverResponse = isUdacityResponse ? data?.fromUdacityData().toJsonSafe() : data?.toJsonSafe() {
 					responseHandler(.error(data, ApplicationErrors.serverSideError(serverResponse), response))
 				} else {
 					responseHandler(.error(data, error ?? ApplicationErrors.unknown, response))
@@ -135,6 +137,20 @@ final class ApiClient {
 				let locations = results.filter { $0 is [String: Any] }.map { StudentLocation(json: $0 as! [String:Any]) }.flatMap { $0 }
 				return ApiRequestResult.studentLocations(locations)
 			}))
+		}))
+	}
+	
+	func createStudentLocation(_ template: StudentLocation, completion: @escaping (ApiRequestResult) -> ()) {
+		let request = URLRequest.createLocation(with: template.toJson())
+		networkClient.execute(request, completion: ApiClient.parseResponse(isUdacityResponse: false, responseHandler: { result in
+			completion(ApiClient.formatCompletionValue(for: result, onSuccess: { _ in .locationCreated }))
+		}))
+	}
+	
+	func updateLocation(locationId: String, newLocation template: StudentLocation, completion: @escaping (ApiRequestResult) -> ()) {
+		let request = URLRequest.updateLocation(forLocationId: locationId, with: template.toJson())
+		networkClient.execute(request, completion: ApiClient.parseResponse(isUdacityResponse: false, responseHandler: { result in
+			completion(ApiClient.formatCompletionValue(for: result, onSuccess: { _ in .locationUpdated }))
 		}))
 	}
 	

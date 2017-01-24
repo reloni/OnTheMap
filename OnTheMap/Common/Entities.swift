@@ -48,7 +48,9 @@ struct StudentLocation {
 	let mediaURL: String
 	let objectId: String
 	let uniqueKey: String
-	
+}
+
+extension StudentLocation {
 	init?(json: [String:Any]) {
 		guard let fn: String = json["firstName"] as? String else { return nil }
 		guard let ln: String = json["lastName"] as? String else { return nil }
@@ -67,5 +69,10 @@ struct StudentLocation {
 		mediaURL = mu
 		objectId = oi
 		uniqueKey = uk
+	}
+	
+	func toJson() -> [String: Any] {
+		return ["uniqueKey": uniqueKey, "firstName": firstName, "lastName": lastName, "mapString": mapString,
+		            "mediaURL": mediaURL, "latitude": latitude, "longitude": longitude]
 	}
 }

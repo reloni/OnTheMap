@@ -11,7 +11,7 @@ import UIKit
 import MapKit
 
 final class FindLocationController : UIViewController {
-	var completion: ((CLLocationCoordinate2D, URL) -> ())!
+	var completion: ((StudentLocation) -> ())!
 	
 	@IBOutlet weak var locationTextField: UITextField!
 	@IBOutlet weak var webSiteTextField: UITextField!
@@ -41,8 +41,15 @@ final class FindLocationController : UIViewController {
 			DispatchQueue.main.async {
 				let controller = self.storyboard!.instantiateViewController(withIdentifier: "ConfirmLocationController") as! ConfirmLocationController
 				controller.completion = self.completion
-				controller.location = result
-				controller.url = url
+				controller.locationTemplate = StudentLocation(firstName: self.appDelegate.udacityUser!.firstName,
+				                                       lastName: self.appDelegate.udacityUser!.lastName,
+				                                       latitude: result.latitude,
+				                                       longitude: result.longitude,
+				                                       mapString: geoString,
+				                                       mediaURL: url.absoluteString,
+				                                       objectId: "",
+				                                       uniqueKey: self.appDelegate.udacityUser!.authenticationInfo.key)
+
 				self.navigationController?.pushViewController(controller, animated: true)
 			}
 		}
