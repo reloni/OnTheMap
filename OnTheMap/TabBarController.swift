@@ -44,22 +44,49 @@ final class TabBarController : UITabBarController {
 		apiClient.currentUserLocation(userUniqueKey: appDelegate.udacityUser!.authenticationInfo.key) { [weak self] result in
 				switch result {
 				case ApiRequestResult.currentUserLocation(let currentLocation):
-					self?.presentFindLocatonController(currentLocation: currentLocation) { result in
-						if currentLocation == nil {
-							self?.createStudentLocation(template: result) { error in
-								guard let error = error else { self?.refreshTabs(); return }
-								self?.showErrorAlert(error: error)
-							}
-						} else {
-							self?.updateUserLocation(currentLocationId: currentLocation!.objectId, template: result) { error in
-								guard let error = error else { self?.refreshTabs(); return }
-								self?.showErrorAlert(error: error)
+					self?.checkLocationOverwrite(currentLocation: currentLocation) {
+						self?.presentFindLocatonController(currentLocation: currentLocation) { result in
+							if currentLocation == nil {
+								self?.createStudentLocation(template: result) { error in
+									guard let error = error else { self?.refreshTabs(); return }
+									self?.showErrorAlert(error: error)
+								}
+							} else {
+								self?.updateUserLocation(currentLocationId: currentLocation!.objectId, template: result) { error in
+									guard let error = error else { self?.refreshTabs(); return }
+									self?.showErrorAlert(error: error)
+								}
 							}
 						}
 					}
 				case .error(let e): self?.showErrorAlert(error: e)
 				default: break
 			}
+		}
+	}
+	
+	func checkLocationOverwrite(currentLocation: StudentLocation?, completion: @escaping () -> ()) {
+		guard currentLocation != nil else {
+			completion()
+			return
+		}
+		
+		showLocationOverwriteAlert { shouldOverwrite in
+			guard shouldOverwrite else { return }
+			completion()
+		}
+	}
+	
+	func showLocationOverwriteAlert(completion: @escaping (Bool) -> Void) {
+		let message = "User \(appDelegate.udacityUser?.firstName ?? "") \(appDelegate.udacityUser?.lastName ?? "") has already posted a student location. Would you like to overwrite their location?"
+		let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
+		let overwrite = UIAlertAction(title: "Overwrite", style: .default, handler: { _ in completion(true) })
+		let cancel = UIAlertAction(title: "Cancel", style: .default, handler: { _ in completion(false) })
+		alert.addAction(overwrite)
+		alert.addAction(cancel)
+		
+		DispatchQueue.main.async {
+			self.present(alert, animated: true, completion: nil)
 		}
 	}
 	
