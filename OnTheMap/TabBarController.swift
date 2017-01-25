@@ -8,10 +8,15 @@
 
 import UIKit
 
+protocol LocationDisplayControllerType {
+	func refresh()
+}
+
 final class TabBarController : UITabBarController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
+		refreshTabs()
 	}
 	
 	@IBAction func logOut(_ sender: Any) {
@@ -32,8 +37,7 @@ final class TabBarController : UITabBarController {
 	}
 	
 	@IBAction func refresh(_ sender: Any) {
-		print("refresh. Cur index: \(selectedIndex)")
-		
+		refreshTabs()
 	}
 	
 	@IBAction func addUserLocation(_ sender: Any) {
@@ -41,13 +45,15 @@ final class TabBarController : UITabBarController {
 				switch result {
 				case ApiRequestResult.currentUserLocation(let currentLocation):
 					self?.presentFindLocatonController(currentLocation: currentLocation) { result in
-						print("New location: \(result)")
 						if currentLocation == nil {
-							print("create new location")
+							self?.createStudentLocation(template: result) { error in
+								guard let error = error else { self?.refreshTabs(); return }
+								self?.showErrorAlert(error: error)
+							}
 						} else {
-							print("update current location")
 							self?.updateUserLocation(currentLocationId: currentLocation!.objectId, template: result) { error in
-									print("update error: \(error)")
+								guard let error = error else { self?.refreshTabs(); return }
+								self?.showErrorAlert(error: error)
 							}
 						}
 					}
@@ -57,6 +63,31 @@ final class TabBarController : UITabBarController {
 		}
 	}
 	
+	func refreshTabs() {
+		apiClient.studentLocations { [weak self] result in
+			switch result {
+			case ApiRequestResult.studentLocations(let locations):
+				guard let this = self else { return }
+				this.appDelegate.locations = locations
+				for tab in this.viewControllers! {
+					DispatchQueue.main.async { (tab as? LocationDisplayControllerType)?.refresh() }
+				}
+			case .error(let e): self?.showErrorAlert(error: e)
+			default: break
+			}
+		}
+	}
+	
+	func createStudentLocation(template: StudentLocation, completion: @escaping (Error?) -> ()) {
+		apiClient.createStudentLocation(template) { result in
+			switch result {
+			case .locationCreated: completion(nil)
+			case .error(let e): completion(e)
+			default: break
+			}
+		}
+	}
+
 	func updateUserLocation(currentLocationId: String, template: StudentLocation, completion: @escaping (Error?) -> ()) {
 		apiClient.updateLocation(locationId: currentLocationId, newLocation: template) { result in
 			switch result {

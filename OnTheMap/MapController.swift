@@ -14,16 +14,6 @@ final class MapController : UIViewController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		
-		apiClient.studentLocations { [weak self] result in
-			switch result {
-			case ApiRequestResult.studentLocations(let locations):
-				self?.appDelegate.locations = locations
-				self?.addAnnototions(locations)
-			case .error(let e): self?.showErrorAlert(error: e)
-			default: break
-			}
-		}
 	}
 	
 	func addAnnototions(_ locations: [StudentLocation]) {
@@ -36,8 +26,15 @@ final class MapController : UIViewController {
 		}
 
 		DispatchQueue.main.async {
+			self.mapView.removeAnnotations(self.mapView.annotations)
 			self.mapView.addAnnotations(annotations)
 		}
+	}
+}
+
+extension MapController : LocationDisplayControllerType {
+	func refresh() {
+		addAnnototions(appDelegate.locations)
 	}
 }
 

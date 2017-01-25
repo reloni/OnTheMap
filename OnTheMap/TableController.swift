@@ -9,8 +9,13 @@
 import UIKit
 
 final class TableController : UIViewController {
-	
 	@IBOutlet weak var tableView: UITableView!
+}
+
+extension TableController : LocationDisplayControllerType {
+	func refresh() {
+		tableView?.reloadSections(IndexSet(integer: 0), with: .automatic)
+	}
 }
 
 extension TableController : UITableViewDataSource {
