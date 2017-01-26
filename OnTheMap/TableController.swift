@@ -27,6 +27,7 @@ extension TableController : UITableViewDataSource {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "LocationCell", for: indexPath)
 		let location = appDelegate.locations[indexPath.row]
 		cell.textLabel?.text = "\(location.firstName) \(location.lastName)"
+		cell.detailTextLabel?.text = location.mediaURL
 		cell.imageView?.image = UIImage(named: "pin")!
 		return cell
 	}
@@ -35,7 +36,10 @@ extension TableController : UITableViewDataSource {
 extension TableController : UITableViewDelegate {
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		let location = appDelegate.locations[indexPath.row]
-		guard let url = URL(string: location.mediaURL) else { return }
+		guard let url = URL(baseUrl: location.mediaURL) else {
+			showErrorAlert(message: "Invalid URL")
+			return
+		}
 		
 		UIApplication.shared.open(url, options: [:], completionHandler: nil)
 	}

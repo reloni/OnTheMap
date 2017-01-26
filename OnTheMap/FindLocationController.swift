@@ -27,7 +27,7 @@ final class FindLocationController : UIViewController {
 			return
 		}
 		
-		guard let urlString = webSiteTextField.text, let url = URL(string: urlString) else {
+		guard let urlString = webSiteTextField.text, let url = URL(baseUrl: urlString) else {
 			showErrorAlert(message: "Must enter a valid URL")
 			return
 		}

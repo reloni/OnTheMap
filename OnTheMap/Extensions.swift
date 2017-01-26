@@ -23,7 +23,7 @@ extension URL {
 			URLQueryItem(name: key, value: value)
 		}
 		
-		guard let absoluteString = components?.url?.absoluteString else { return nil }
+		guard let absoluteString = components?.url?.absoluteString, let _ = components?.scheme, let _ = components?.host else { return nil }
 		
 		self.init(string: absoluteString)
 	}

@@ -34,8 +34,8 @@ struct UdacityUser {
 		guard let ln: String = json[jsonKey: "user"]?["last_name"] as? String else { return nil }
 		
 		authenticationInfo = authInfo
-		firstName = fn
-		lastName = ln
+		firstName = fn.characters.count > 0 ? fn : "No first name"
+		lastName = ln.characters.count > 0 ? ln : "No last name"
 	}
 }
 
@@ -61,8 +61,8 @@ extension StudentLocation {
 		guard let lo: Double = json["longitude"] as? Double else { return nil }
 		guard let la: Double = json["latitude"] as? Double else { return nil }
 		
-		firstName = fn
-		lastName = ln
+		firstName = fn.characters.count > 0 ? fn : "No first name"
+		lastName = ln.characters.count > 0 ? ln : "No last name"
 		latitude = la
 		longitude = lo
 		mapString = ms

@@ -118,7 +118,7 @@ final class ApiClient {
 		}))
 	}
 	
-	func currentUserLocation(userUniqueKey: String, completion: @escaping (ApiRequestResult) -> ()) {
+	func currentUserLocation(userUniqueKey: String, completion: @escaping (ApiRequestResult) -> ()) {		
 		let request = URLRequest.userLocation(uniqueKey: userUniqueKey)
 		networkClient.execute(request, completion: ApiClient.parseResponse(isUdacityResponse: false, responseHandler: { result in
 			completion(ApiClient.formatCompletionValue(for: result, onSuccess: { json in
