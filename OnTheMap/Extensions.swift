@@ -117,7 +117,25 @@ extension Data {
 	}
 }
 
+extension UIActivityIndicatorView {
+	func safeRomoveFromSuperview() {
+		DispatchQueue.main.async {
+			self.removeFromSuperview()
+		}
+	}
+}
+
 extension UIViewController {
+	func createActivityView() -> UIActivityIndicatorView {
+		let activity = UIActivityIndicatorView(frame: appDelegate.window!.rootViewController!.view.frame)
+		activity.activityIndicatorViewStyle = .whiteLarge
+		activity.startAnimating()
+		activity.center = appDelegate.window!.rootViewController!.view.center
+		activity.backgroundColor = .black
+		activity.alpha = 0.45
+		return activity
+	}
+	
 	func loadGeoCoordinates(for geoString : String, completion: @escaping (CLLocationCoordinate2D?) -> Void) {
 		CLGeocoder().geocodeAddressString(geoString) { (marks, error) in
 			guard error == nil else { completion(nil); return }

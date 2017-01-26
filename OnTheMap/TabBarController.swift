@@ -21,7 +21,10 @@ final class TabBarController : UITabBarController {
 	
 	@IBAction func logOut(_ sender: Any) {
 		appDelegate.udacityUser = nil
+		let activity = createActivityView()
+		view.addSubview(activity)
 		apiClient.logoff { [weak self] result in
+			activity.safeRomoveFromSuperview()
 			if case ApiRequestResult.error = result {
 				self?.showErrorAlert(message: "Error while logging off")
 			}
@@ -41,26 +44,38 @@ final class TabBarController : UITabBarController {
 	}
 	
 	@IBAction func addUserLocation(_ sender: Any) {
+		let activity = createActivityView()
+		view.addSubview(activity)
+		
 		apiClient.currentUserLocation(userUniqueKey: appDelegate.udacityUser!.authenticationInfo.key) { [weak self] result in
-				switch result {
-				case ApiRequestResult.currentUserLocation(let currentLocation):
-					self?.checkLocationOverwrite(currentLocation: currentLocation) {
-						self?.presentFindLocatonController(currentLocation: currentLocation) { result in
-							if currentLocation == nil {
-								self?.createStudentLocation(template: result) { error in
-									guard let error = error else { self?.refreshTabs(); return }
-									self?.showErrorAlert(error: error)
-								}
-							} else {
-								self?.updateUserLocation(currentLocationId: currentLocation!.objectId, template: result) { error in
-									guard let error = error else { self?.refreshTabs(); return }
-									self?.showErrorAlert(error: error)
-								}
+			activity.safeRomoveFromSuperview()
+			
+			switch result {
+			case ApiRequestResult.currentUserLocation(let currentLocation):
+				self?.checkLocationOverwrite(currentLocation: currentLocation) {
+					self?.presentFindLocatonController(currentLocation: currentLocation) { result in
+						
+						DispatchQueue.main.async { self?.view.addSubview(activity) }
+						
+						if currentLocation == nil {
+							self?.createStudentLocation(template: result) { error in
+								activity.safeRomoveFromSuperview()
+								
+								guard let error = error else { self?.refreshTabs(); return }
+								self?.showErrorAlert(error: error)
+							}
+						} else {
+							self?.updateUserLocation(currentLocationId: currentLocation!.objectId, template: result) { error in
+								activity.safeRomoveFromSuperview()
+								
+								guard let error = error else { self?.refreshTabs(); return }
+								self?.showErrorAlert(error: error)
 							}
 						}
 					}
-				case .error(let e): self?.showErrorAlert(error: e)
-				default: break
+				}
+			case .error(let e): self?.showErrorAlert(error: e)
+			default: break
 			}
 		}
 	}
@@ -91,7 +106,14 @@ final class TabBarController : UITabBarController {
 	}
 	
 	func refreshTabs() {
+		let activity = createActivityView()
+		DispatchQueue.main.async {
+			self.view.addSubview(activity)
+		}
+		
 		apiClient.studentLocations { [weak self] result in
+			activity.safeRomoveFromSuperview()
+			
 			switch result {
 			case ApiRequestResult.studentLocations(let locations):
 				guard let this = self else { return }

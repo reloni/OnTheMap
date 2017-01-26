@@ -29,7 +29,11 @@ class LoginController: UIViewController {
 		guard let login = loginTextField.text, login.characters.count > 0 else { return }
 		guard let password = passwordTextField.text, password.characters.count > 0 else { return }
 		
+		let activity = createActivityView()
+		view.addSubview(activity)
+		
 		apiClient.login(userName: login, password: password) { [weak self] result in
+			activity.safeRomoveFromSuperview()
 			switch result{
 			case .login(let user):
 				self?.appDelegate.udacityUser = user

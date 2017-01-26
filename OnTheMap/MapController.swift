@@ -40,7 +40,6 @@ extension MapController : LocationDisplayControllerType {
 
 extension MapController : MKMapViewDelegate {
 	func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-		//print("viewForannotation")
 		if annotation is MKUserLocation {
 			return nil
 		}
