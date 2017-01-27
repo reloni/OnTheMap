@@ -11,9 +11,15 @@ import UIKit
 class LoginController: UIViewController {
 	@IBOutlet weak var loginTextField: UITextField!
 	@IBOutlet weak var passwordTextField: UITextField!
+	@IBOutlet weak var signUpLabel: UILabel!
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
+		
+		let recognizer = UITapGestureRecognizer(target: self, action: #selector(signUp))
+		recognizer.numberOfTapsRequired = 1
+		signUpLabel.isUserInteractionEnabled = true
+		signUpLabel.addGestureRecognizer(recognizer)
 		
 		let kc = Keychain()
 		if let userName = kc.stringForAccount(account: "UserName") {
@@ -23,6 +29,12 @@ class LoginController: UIViewController {
 		if let userPassword = kc.stringForAccount(account: "Password") {
 			passwordTextField.text = userPassword
 		}
+	}
+	
+	func signUp() {
+		UIApplication.shared.open(URL(string: "https://auth.udacity.com/sign-up?next=https%3A%2F%2Fclassroom.udacity.com%2Fauthenticated")!,
+		                          options: [:],
+		                          completionHandler: nil)
 	}
 	
 	@IBAction func logInTap(_ sender: Any) {
