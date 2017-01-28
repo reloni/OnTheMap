@@ -150,6 +150,7 @@ extension UIViewController {
 	func showErrorAlert(error: Error) {
 		let errorMessage: String = {
 			switch error {
+			case let e as URLError where e.code == URLError.notConnectedToInternet: return "Not connected to internet"
 			case ApplicationErrors.incorrectServerResponse: return "Incorrect response from server"
 			case ApplicationErrors.jsonParseError(let e): return e.localizedDescription
 			case ApplicationErrors.serverSideError(let json): return (json["error"] as? String) ?? "Unknown error"

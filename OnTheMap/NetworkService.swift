@@ -20,7 +20,7 @@ enum ApplicationErrors : Error {
 /// Represents response from network
 enum NetworkRequestResult {
 	case success([String: Any])
-	case error(Data?, Error, HTTPURLResponse)
+	case error(Data?, Error, HTTPURLResponse?)
 	case unknown
 }
 
@@ -63,7 +63,16 @@ final class ApiClient {
 	
 	private static func parseResponse(isUdacityResponse: Bool = true, responseHandler: @escaping (NetworkRequestResult) -> ()) -> UrlRequestResult {
 		return { data, response, error in
-			guard let response = response as? HTTPURLResponse else { responseHandler(.unknown); return }
+			guard let response = response as? HTTPURLResponse else {
+				guard let error = error else {
+					responseHandler(.unknown)
+					return
+				}
+				
+				responseHandler(.error(nil, error, nil))
+				
+				return
+			}
 			
 			guard 200...299 ~= response.statusCode else {
 				if let serverResponse = isUdacityResponse ? data?.fromUdacityData().toJsonSafe() : data?.toJsonSafe() {
