@@ -13,6 +13,8 @@ class LoginController: UIViewController {
 	@IBOutlet weak var passwordTextField: UITextField!
 	@IBOutlet weak var signUpLabel: UILabel!
 	
+	var editingTextField: UITextField?
+	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
@@ -20,6 +22,9 @@ class LoginController: UIViewController {
 		recognizer.numberOfTapsRequired = 1
 		signUpLabel.isUserInteractionEnabled = true
 		signUpLabel.addGestureRecognizer(recognizer)
+		
+		loginTextField.delegate = self
+		passwordTextField.delegate = self
 		
 		let kc = Keychain()
 		if let userName = kc.stringForAccount(account: "UserName") {
@@ -31,10 +36,43 @@ class LoginController: UIViewController {
 		}
 	}
 	
+	override func viewWillAppear(_ animated: Bool) {
+		NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: .UIKeyboardWillShow, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: .UIKeyboardWillHide, object: nil)
+	}
+	
+	override func viewWillDisappear(_ animated: Bool) {
+		super.viewWillDisappear(animated)
+		NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillShow, object: nil)
+		NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillHide, object: nil)
+	}
+	
 	func signUp() {
 		UIApplication.shared.open(URL(string: "https://auth.udacity.com/sign-up?next=https%3A%2F%2Fclassroom.udacity.com%2Fauthenticated")!,
 		                          options: [:],
 		                          completionHandler: nil)
+	}
+	
+	func keyboardWillShow(_ notification: Notification) {
+		guard let textField = editingTextField else { return }
+		
+		let fieldYPosition = view.frame.height - (textField.frame.origin.y + textField.frame.height)
+		let keyboardHeight = notification.keyboardHeight()
+		
+		// adjust frame only if keyboard hides text field
+		guard keyboardHeight > fieldYPosition else {
+			return
+		}
+		
+		UIView.animate(withDuration: 0.4, delay: 0.1, options: .curveEaseOut, animations: {
+			self.view.frame.origin.y = fieldYPosition - keyboardHeight - 10
+		})
+	}
+	
+	func keyboardWillHide(_ notification: Notification) {
+		UIView.animate(withDuration: 0.4, delay: 0.1, options: .curveEaseOut, animations: {
+			self.view.frame.origin.y = 0
+		})
 	}
 	
 	@IBAction func logInTap(_ sender: Any) {
@@ -62,6 +100,19 @@ class LoginController: UIViewController {
 		let kc = Keychain()
 		kc.setString(string: userName, forAccount: "UserName", synchronizable: true, background: false)
 		kc.setString(string: password, forAccount: "Password", synchronizable: true, background: false)
+	}
+}
+
+
+extension LoginController : UITextFieldDelegate {
+	func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+		editingTextField = textField
+		return true
+	}
+	
+	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+		textField.resignFirstResponder()
+		return true
 	}
 }
 

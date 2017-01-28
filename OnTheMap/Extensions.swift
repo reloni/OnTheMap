@@ -10,6 +10,12 @@ import Foundation
 import UIKit
 import MapKit
 
+extension Notification {
+	func keyboardHeight() -> CGFloat {
+		return (userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect)?.height ?? 0
+	}
+}
+
 extension Dictionary {
 	subscript(jsonKey key: Key) -> [String:Any]? {
 		return self[key] as? [String:Any]
